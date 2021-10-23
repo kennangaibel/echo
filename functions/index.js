@@ -7,12 +7,11 @@ admin.initializeApp();
 
 const fs = require('fs');
 const util = require('util');
-
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
 exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
-    const client = new vision.ImageAnnotatorClient();
+    const vision_client = new vision.ImageAnnotatorClient();
 
     let data = {
         "requests": [
@@ -33,7 +32,7 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     }
 
     try {
-        console.log(client.annotateImage(JSON.parse(JSON.stringify(data))));
+        console.log(vision_client.annotateImage(JSON.parse(JSON.stringify(data))));
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
@@ -43,12 +42,26 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
 
     // Parse json string to text-to-audio format
 
-    // text to speech reads inputted value,
-
     // text to speech outputs mp3
 
+    // The text to synthesize
+    const client = new textToSpeech.TextToSpeechClient();
+
+    const text = "temp"//parsed json string;
+    const request = {
+        input: {text: text},
+        voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
+        audioConfig: {audioEncoding: 'MP3'},
+    };
+
+    // Performs the text-to-speech request
+    async function parseAudio() {
+        const [response] = await client.synthesizeSpeech(request);
+        // Write the binary audio content to a local file
+        const writeFile = util.promisify(fs.writeFile);
+        await writeFile('output.mp3', response.audioContent, 'binary');
+        console.log('Audio content written to file: output.mp3');
+    }
+    parseAudio();
     // flutter reads mp3
-
-    // convert JSON string to audio (mp3)
 });
-
