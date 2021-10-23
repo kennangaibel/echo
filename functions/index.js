@@ -1,12 +1,43 @@
-const functions = require("firebase-functions");
+// The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
+const functions = require('firebase-functions');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
+// The Firebase Admin SDK to access Firestore.
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+const fs = require('fs');
+const util = require('util');
+
+//npm install --save @google-cloud/text-to-speech
+
 // exports.helloWorld = functions.https.onRequest((request, response) => {
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+// convert JSON string to audio (mp3)
+exports.convertAudio = functions.https.onRequest((req, res) => {
+
+    // text = parsed JSON string
+    const text = "";
+
+    // Construct the request
+    const request = {
+        input: {text: text},
+        // Select the language and SSML voice gender (optional)
+        voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
+        // select the type of audio encoding
+        audioConfig: {audioEncoding: 'MP3'},
+    };
+
+    // Performs the text-to-speech request
+    const [response] = await client.synthesizeSpeech(request);
+    // Write the binary audio content to a local file
+    const writeFile = util.promisify(fs.writeFile);
+    await writeFile('output.mp3', response.audioContent, 'binary');
+    console.log('Audio content written to file: output.mp3');
+
+});
 
 // Pull in Firebase and GCloud deps
 var firebase = require('firebase');
