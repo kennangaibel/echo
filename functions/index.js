@@ -6,7 +6,6 @@ admin.initializeApp();
 
 const fs = require('fs');
 const util = require('util');
-
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
@@ -22,13 +21,9 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     async function quickStart() {
         // The text to synthesize
         const text = //parsed json string;
-
-        // Construct the request
         const request = {
             input: {text: text},
-            // Select the language and SSML voice gender (optional)
             voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
-            // select the type of audio encoding
             audioConfig: {audioEncoding: 'MP3'},
         };
 
