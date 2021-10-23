@@ -17,24 +17,26 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     // Parse json string to text-to-audio format
 
     // text to speech outputs mp3
-    const client = new textToSpeech.TextToSpeechClient();
-    async function quickStart() {
-        // The text to synthesize
-        const text = "temp"//parsed json string;
-        const request = {
-            input: {text: text},
-            voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
-            audioConfig: {audioEncoding: 'MP3'},
-        };
 
-        // Performs the text-to-speech request
+    // The text to synthesize
+    const client = new textToSpeech.TextToSpeechClient();
+
+    const text = "temp"//parsed json string;
+    const request = {
+        input: {text: text},
+        voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
+        audioConfig: {audioEncoding: 'MP3'},
+    };
+
+    // Performs the text-to-speech request
+    async function parseAudio() {
         const [response] = await client.synthesizeSpeech(request);
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
         await writeFile('output.mp3', response.audioContent, 'binary');
         console.log('Audio content written to file: output.mp3');
     }
-    quickStart();
+    parseAudio();
 
     // flutter reads mp3
 });
