@@ -20,7 +20,7 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     const client = new textToSpeech.TextToSpeechClient();
     async function quickStart() {
         // The text to synthesize
-        const text = //parsed json string;
+        const text = "temp"//parsed json string;
         const request = {
             input: {text: text},
             voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
