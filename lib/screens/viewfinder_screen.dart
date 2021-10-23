@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart';
 
 import '../main.dart';
 
@@ -46,7 +50,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     // Instantiating the camera controller
     final CameraController cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.ultraHigh,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
 
@@ -93,7 +97,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
       width: 125,
       child: Center(
         child:MaterialButton(
-          onPressed: () {},
+          onPressed: () { clickShutter(); },
           elevation: 2.0,
           color: Colors.white,
           child: const Icon(
@@ -107,9 +111,55 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     );
   }
 
+  Future<XFile?> takePicture() async {
+    final CameraController? cameraController = controller;
+    if (cameraController!.value.isTakingPicture) {
+      // A capture is already pending, do nothing.
+      return null;
+    }
+    try {
+      XFile file = await cameraController.takePicture();
+      return file;
+    } on CameraException catch (e) {
+      print('Error occured while taking picture: $e');
+      return null;
+    }
+  }
+
+  void clickShutter() async {
+    XFile? rawImage = await takePicture();
+    File imageFile = File(rawImage!.path);
+    String fileName = basename(imageFile.path);
+
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('/$fileName');
+
+    final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'picked-file-path': fileName});
+    firebase_storage.UploadTask uploadTask;
+    //late StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
+    uploadTask = ref.putFile(File(imageFile.path), metadata);
+
+    firebase_storage.UploadTask task= await Future.value(uploadTask);
+    Future.value(uploadTask).then((value) => {
+      print("Upload file path ${value.ref.fullPath}")
+    }).onError((error, stackTrace) => {
+      print("Upload file path error ${error.toString()} ")
+    });
+  }
+
+  Widget wholeScreenButton(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: GestureDetector(
+        onTap: () { clickShutter(); },
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
           body: Stack(
               children: [
@@ -124,6 +174,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
                     )
                   ) : Container(),
                 cameraShutter(),
+                wholeScreenButton(context),
               ]
           )
     );

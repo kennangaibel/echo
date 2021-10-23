@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
 // Local Imports
 import 'package:illuminate/screens/viewfinder_screen.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   } on CameraException catch (e) {
     print('Error in fetching the cameras: $e');
   }
+  await firebase_core.Firebase.initializeApp();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
   ]);
