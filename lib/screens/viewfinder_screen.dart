@@ -150,11 +150,9 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     //late StorageUploadTask uploadTask = firebaseStorageRef.putFile(_imageFile);
     uploadTask = ref.putFile(File(imageFile.path), metadata);
 
-    firebase_storage.UploadTask task= await Future.value(uploadTask);
-    String uri = "";
-    Future.value(uploadTask).then((value) => {
-      uri = "gs:\\\\${value.ref.bucket}\\${value.ref.fullPath}"
-    }).onError((error, stackTrace) => {
+    firebase_storage.UploadTask task = await Future.value(uploadTask);
+    String uri = await task.then((value) {
+      return value.ref.fullPath;
     });
     playSound();
     Navigator.push(

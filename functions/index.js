@@ -16,14 +16,12 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
 
     // Get json string from vision API
 
-    functions.logger.log(data);
-
     let response;
 
     try {
         const request = {
             image: {
-                source: { imageUri: data.uri },
+                source: { imageUri: `gs://echo-11de8-images/${data.uri}` },
             },
             features:[
                 {
@@ -32,7 +30,9 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
                 }
             ]
         };
+        functions.logger.log(request);
         response = await vision_client.annotateImage(request);
+        functions.logger.log(response);
         functions.logger.log(response[0].labelAnnotations);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
@@ -107,11 +107,9 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
         // destination: 'output.mp3',
         metadata: metadata
     };
-    let file;
-    bucket.upload(outputPath, options).then(function(data) {
-        file = data[0];
-        functions.logger.log(data);
+    let file = bucket.upload(outputPath, options).then(function(data) {
+        return data[0];
     });
-    return file;
+    return (await file).metadata.name;
     // flutter reads mp3
 });
