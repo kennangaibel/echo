@@ -16,6 +16,8 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
 
     // Get json string from vision API
 
+    functions.logger.log(data);
+
     let response;
 
     try {
@@ -37,7 +39,7 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
     }
 
     // Parse json string to text-to-audio format
-    
+
     // Vision API will send a json stringy
     // Iterate through json Object
 
@@ -47,7 +49,7 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
 
     // json string becomes an object through parsing
     // let obj = JSON.parse(json);
-    
+
     // Array where names of identified objects will be stored
     let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
@@ -61,7 +63,7 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
     // string that'll be sent to the text-to-speech
     let speechText = "";
     let ch = nameArray[0].charAt(0);
-    if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+    if (ch === 'a' || ch === 'e' || ch === 'i' || ch === 'o' || ch === 'u') {
         speechText = "There is an ";
     } else {
         speechText = "There is a ";
