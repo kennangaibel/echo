@@ -10,7 +10,7 @@ const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
-exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
+exports.visionAnalysis = functions.storage.object().onFinalize(async (object) => {
     const vision_client = new vision.ImageAnnotatorClient();
 // Taking the image and feed it into VISION API
 
@@ -34,7 +34,19 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     }
 
     try {
-        console.log(vision_client.annotateImage(JSON.parse(JSON.stringify(data))));
+        const request = {
+            image: {
+                source: { imageUri: `gs://${object.bucket}/${object.name}` },
+            },
+            features:[
+                {
+                    type: "LABEL_DETECTION",
+                    maxResults: 1
+                }
+            ]
+        };
+        const response = await vision_client.annotateImage(request);
+        functions.logger.log(response);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
