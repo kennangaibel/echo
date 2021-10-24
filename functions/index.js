@@ -10,7 +10,7 @@ const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
-exports.visionAnalysis = functions.storage.object().onFinalize(async (object) => {
+exports.visionAnalysis = functions.storage.bucket("echo-11de8.appspot.com ").object().onFinalize(async (object) => {
     const vision_client = new vision.ImageAnnotatorClient();
 // Taking the image and feed it into VISION API
 
@@ -78,7 +78,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         audioConfig: {audioEncoding: 'MP3'},
     };
 
-    // Performs the text-to-speech request
+    //Performs the text-to-speech request
 
     async function parseAudio() {
         const {Storage} = require("@google-cloud/storage");
@@ -93,7 +93,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         functions.logger.log(outputPath);
 
         const storage = new Storage();
-        const bucket = storage.bucket('echo-11de8.appspot.com');
+        const bucket = storage.bucket('echo-11de8-audio');
         const metadata = {
             contentType: 'audio/mpeg'
         }
