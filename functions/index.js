@@ -46,7 +46,7 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
 
     // extract object.name
     // json will be the array of JSON_objects Nithin returns
-    let json; // output from Nithin here;
+    let json = response.labelAnnotations; // output from Nithin here;
 
     // json string becomes an object through parsing
     let obj = JSON.parse(json);
@@ -90,6 +90,6 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     // Need to get the mp3 file thats parsed into the firebase storage
 
 
-    
+
     // flutter reads mp3
 });
