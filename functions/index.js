@@ -93,6 +93,7 @@ exports.visionAnalysis = functions.storage.bucket("echo-11de8.appspot.com ").obj
         functions.logger.log(outputPath);
 
         const storage = new Storage();
+        // 2nd bucket created
         const bucket = storage.bucket('echo-11de8-audio');
         const metadata = {
             contentType: 'audio/mpeg'
