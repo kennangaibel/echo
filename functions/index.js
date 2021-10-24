@@ -1,12 +1,12 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
 const functions = require('firebase-functions');
-const vision = require('@google-cloud/vision');
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
 admin.initializeApp();
 
 const fs = require('fs');
 const util = require('util');
+const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
@@ -52,9 +52,9 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     let obj = JSON.parse(json);
     
     // Array where names of identified objects will be stored
-    var nameArray = [];
+    let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
-    for (var i = 0; i < jsonArray.length; i++) {
+    for (let i = 0; i < jsonArray.length; i++) {
         // unsure if it should be obj.labelAnnotations.description
         nameArray.push(obj[i].description);
     }
@@ -86,7 +86,7 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
         await writeFile('output.mp3', response.audioContent, 'binary');
         console.log('Audio content written to file: output.mp3');
     }
-    parseAudio();
+    await parseAudio();
     // Need to get the mp3 file thats parsed into the firebase storage
 
 
