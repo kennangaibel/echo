@@ -33,6 +33,8 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         ]
     }
 
+    let response;
+
     try {
         const request = {
             image: {
@@ -45,8 +47,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
                 }
             ]
         };
-        const response = await vision_client.annotateImage(request);
-        functions.logger.log(response);
+        response = await vision_client.annotateImage(request);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
@@ -67,15 +68,17 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
     let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
     for (let i = 0; i < jsonArray.length; i++) {
+        functions.logger.log(obj[i].description);
         // unsure if it should be obj.labelAnnotations.description
         nameArray.push(obj[i].description);
     }
 
     // string that'll be sent to the text-to-speech
-    let speechText = "";
-    for (let i = 0; i < nameArray.length; i++) {
-        speechText = "There is a " + nameArray[i] + " ";
+    let speechText = "There is a ";
+    for (let i = 0; i < nameArray.length - 1; i++) {
+        speechText += nameArray[i] + ", ";
     }
+    speechText += ", and " + nameArray[nameArray.length - 1] + ".";
 
     // create string result
 
