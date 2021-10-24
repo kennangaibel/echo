@@ -8,6 +8,7 @@ const fs = require('fs');
 const util = require('util');
 const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
+const {storage} = require("firebase-admin/lib/storage");
 
 // any time storage is updated this function will run
 exports.visionAnalysis = functions.storage.object().onFinalize(async (object) => {
@@ -85,25 +86,17 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
         //await writeFile('output.mp3', response.audioContent, 'binary');
+        const bucket = storage.bucket('echo-11de');
 
-        //Uploading mp3 to firebase storage
-        let uploadTask = storageRef.putFile(
-              File(filePath),
-              StorageMetadata(
-                type + '/' + extension,
-              ),
-            );
-        console.log('Audio content written to file: output.mp3');
+        const options = {
+            destination: 'sound/'
+        };
+
+        bucket.upload('output.mp3', options).then(function(data) {
+            const file = data[0];
+        });
     }
-    //await parseAudio();
-
-    // Need to get the mp3 file thats parsed into the firebase storage
-    
-    // let speaker = output.mp3;
-
-    // 
-
-
+    await parseAudio();
 
     // flutter reads mp3
 });
