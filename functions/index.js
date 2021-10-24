@@ -15,23 +15,6 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 // Taking the image and feed it into VISION API
 
     // Get json string from vision API
-    let data = {
-        "requests": [
-            {
-                "image": {
-                    "source": {
-                        "imageUri": object.name
-                    }
-                },
-                "features":[
-                    {
-                        "type": "LABEL_DETECTION",
-                        "maxResults": 1
-                    }
-                ]
-            }
-        ]
-    }
 
     let response;
 
@@ -42,12 +25,13 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
             },
             features:[
                 {
-                    type: "LABEL_DETECTION",
-                    maxResults: 1
+                    type: "OBJECT_LOCALIZATION",
+                    maxResults: 10
                 }
             ]
         };
         response = await vision_client.annotateImage(request);
+        functions.logger.log(response[0].localizedObjectAnnotations);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
@@ -63,15 +47,15 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 
     // json string becomes an object through parsing
     // let obj = JSON.parse(json);
-    let obj = response.labelAnnotations;
     
     // Array where names of identified objects will be stored
     let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
-    for (let i = 0; i < nameArray.length; i++) {
-        functions.logger.log(obj[i].description);
-        // unsure if it should be obj.labelAnnotations.description
-        nameArray.push(obj[i].description);
+    for (let i = 0; i < response.length; i++) {
+        response[i].localizedObjectAnnotations.forEach(element => {
+            functions.logger.log(element.name);
+            nameArray.push(element.name);
+        });
     }
 
     // string that'll be sent to the text-to-speech
@@ -95,16 +79,19 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
     };
 
     // Performs the text-to-speech request
-    async function parseAudio() {
-        const [response] = await client.synthesizeSpeech(request);
-        // Write the binary audio content to a local file
-        const writeFile = util.promisify(fs.writeFile);
-        await writeFile('output.mp3', response.audioContent, 'binary');
-        console.log('Audio content written to file: output.mp3');
-    }
-    await parseAudio();
+    // async function parseAudio() {
+    //     const [response] = await client.synthesizeSpeech(request);
+    //     // Write the binary audio content to a local file
+    //     const writeFile = util.promisify(fs.writeFile);
+    //     await writeFile('output.mp3', response.audioContent, 'binary');
+    //     console.log('Audio content written to file: output.mp3');
+    // }
+    // await parseAudio();
     // Need to get the mp3 file thats parsed into the firebase storage
+    
+    // let speaker = output.mp3;
 
+    // 
 
 
     // flutter reads mp3
