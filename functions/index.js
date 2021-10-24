@@ -98,10 +98,10 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
             contentType: 'audio/mpeg'
         }
         const options = {
-            destination: 'sound/',
+            destination: 'sound/output.mp3',
             metadata: metadata
         };
-        bucket.upload(outputPath, options).then(function(data) {
+        bucket.upload('', options).then(function(data) {
             const file = data[0];
         });
     }
