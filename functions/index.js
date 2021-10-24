@@ -25,13 +25,13 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
             },
             features:[
                 {
-                    type: "OBJECT_LOCALIZATION",
-                    maxResults: 10
+                    type: "LABEL_DETECTION",
+                    maxResults: 5
                 }
             ]
         };
         response = await vision_client.annotateImage(request);
-        functions.logger.log(response[0].localizedObjectAnnotations);
+        functions.logger.log(response[0].labelAnnotations);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
@@ -52,9 +52,9 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
     let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
     for (let i = 0; i < response.length; i++) {
-        response[i].localizedObjectAnnotations.forEach(element => {
-            functions.logger.log(element.name);
-            nameArray.push(element.name);
+        response[i].labelAnnotations.forEach(element => {
+            functions.logger.log(element.description);
+            nameArray.push(element.description);
         });
     }
 
