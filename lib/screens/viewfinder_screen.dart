@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:illuminate/screens/analyze_screen.dart';
 import 'package:path/path.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -29,7 +30,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     super.initState();
   }
 
-  play() async {
+  playSound() async {
     int result = await audioPlayer.play('assets/shutter.wav', isLocal: true);
   }
 
@@ -98,13 +99,13 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     audioPlayer.release();
   }
 
-  Widget cameraShutter() {
+  Widget cameraShutter(BuildContext context) {
     return Container(
       color: Colors.black.withAlpha(100),
       width: 125,
       child: Center(
         child:MaterialButton(
-          onPressed: () { clickShutter(); },
+          onPressed: () { clickShutter(context); },
           elevation: 2.0,
           color: Colors.white,
           child: const Icon(
@@ -133,12 +134,14 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     }
   }
 
-  void clickShutter() async {
+  void clickShutter(BuildContext context) async {
     XFile? rawImage = await takePicture();
     File imageFile = File(rawImage!.path);
     String fileName = basename(imageFile.path);
 
-    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('/$fileName');
+    firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instanceFor(
+        bucket: 'echo-11de8-images');
+    firebase_storage.Reference ref = storage.ref().child('/$fileName');
 
     final metadata = firebase_storage.SettableMetadata(
         contentType: 'image/jpeg',
@@ -148,12 +151,16 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     uploadTask = ref.putFile(File(imageFile.path), metadata);
 
     firebase_storage.UploadTask task= await Future.value(uploadTask);
+    String uri = "";
     Future.value(uploadTask).then((value) => {
-      print("Upload file path ${value.ref.fullPath}")
+      print("gs:\\\\${value.ref.bucket}\\${value.ref.fullPath}")
     }).onError((error, stackTrace) => {
-      print("Upload file path error ${error.toString()} ")
     });
-    play();
+    playSound();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AnalyzeScreen(imageUri: uri,)),
+    );
   }
 
   Widget wholeScreenButton(BuildContext context) {
@@ -161,7 +168,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       child: GestureDetector(
-        onTap: () { clickShutter(); },
+        onTap: () { clickShutter(context); },
       )
     );
   }
@@ -181,7 +188,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
                       ),
                     )
                   ) : Container(),
-                cameraShutter(),
+                cameraShutter(context),
                 wholeScreenButton(context),
               ]
           )
