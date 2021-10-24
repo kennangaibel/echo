@@ -100,7 +100,14 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
         //await writeFile('output.mp3', response.audioContent, 'binary');
-        UploadTask uploadAudio = storageRef.putFile(writeFile);
+
+        //Uploading mp3 to firebase storage
+        final StorageUploadTask uploadTask = storageRef.putFile(
+              File(filePath),
+              StorageMetadata(
+                contentType: type + '/' + extension,
+              ),
+            );
         console.log('Audio content written to file: output.mp3');
     }
     //await parseAudio();
