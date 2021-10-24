@@ -93,7 +93,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         functions.logger.log(outputPath);
 
         const storage = new Storage();
-        const bucket = storage.bucket('echo-11de');
+        const bucket = storage.bucket('echo-11de8.appspot.com');
         const options = {
             destination: 'sound/'
         };
