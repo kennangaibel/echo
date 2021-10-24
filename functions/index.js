@@ -59,15 +59,16 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 
     // extract object.name
     // json will be the array of JSON_objects Nithin returns
-    let json = response.labelAnnotations; // output from Nithin here;
+    // let json = response.labelAnnotations; // output from Nithin here;
 
     // json string becomes an object through parsing
-    let obj = JSON.parse(json);
+    // let obj = JSON.parse(json);
+    let obj = response.labelAnnotations;
     
     // Array where names of identified objects will be stored
     let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
-    for (let i = 0; i < jsonArray.length; i++) {
+    for (let i = 0; i < nameArray.length; i++) {
         functions.logger.log(obj[i].description);
         // unsure if it should be obj.labelAnnotations.description
         nameArray.push(obj[i].description);
