@@ -59,11 +59,17 @@ exports.visionAnalysis = functions.storage.bucket("echo-11de8.appspot.com ").obj
     }
 
     // string that'll be sent to the text-to-speech
-    let speechText = "There is a ";
+    let speechText = "";
+    let ch = nameArray[0].charAt(0);
+    if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+        speechText = "There is an ";
+    } else {
+        speechText = "There is a ";
+    }
     for (let i = 0; i < nameArray.length - 1; i++) {
         speechText += nameArray[i] + ", ";
     }
-    speechText += ", and " + nameArray[nameArray.length - 1] + ".";
+    speechText += ", and " + nameArray[nameArray.length - 1] + " in front of you.";
 
     // create string result
 
