@@ -53,7 +53,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 
     // Parse json string to text-to-audio format
     
-    // Vision API will send a json string
+    // Vision API will send a json stringy
     // Iterate through json Object
 
     // extract object.name
@@ -95,11 +95,14 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         const [response] = await client.synthesizeSpeech(request);
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
-        await writeFile('output.mp3', response.audioContent, 'binary');
+        //await writeFile('output.mp3', response.audioContent, 'binary');
+        UploadTask uploadAudio = storageRef.putFile(writeFile);
         console.log('Audio content written to file: output.mp3');
     }
-    await parseAudio();
+    //await parseAudio();
+
     // Need to get the mp3 file thats parsed into the firebase storage
+
 
 
 
