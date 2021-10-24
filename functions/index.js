@@ -9,13 +9,13 @@ const util = require('util');
 const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
-
 // any time storage is updated this function will run
 exports.visionAnalysis = functions.https.onCall(async (data) => {
     const vision_client = new vision.ImageAnnotatorClient();
     // Taking the image and feed it into VISION API
 
     // Get json string from vision API
+
     let response;
 
     try {
@@ -59,11 +59,17 @@ exports.visionAnalysis = functions.https.onCall(async (data) => {
     }
 
     // string that'll be sent to the text-to-speech
-    let speechText = "There is a ";
+    let speechText = "";
+    let ch = nameArray[0].charAt(0);
+    if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+        speechText = "There is an ";
+    } else {
+        speechText = "There is a ";
+    }
     for (let i = 0; i < nameArray.length - 1; i++) {
         speechText += nameArray[i] + ", ";
     }
-    speechText += ", and " + nameArray[nameArray.length - 1] + ".";
+    speechText += ", and " + nameArray[nameArray.length - 1] + " in front of you.";
 
     // create string result
 
