@@ -8,7 +8,6 @@ const fs = require('fs');
 const util = require('util');
 const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
-const {Storage} = require("firebase-admin/lib/storage");
 
 // any time storage is updated this function will run
 exports.visionAnalysis = functions.storage.object().onFinalize(async (object) => {
@@ -82,13 +81,16 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
     // Performs the text-to-speech request
 
     async function parseAudio() {
+        const {Storage} = require("@google-cloud/storage");
         const [response] = await client.synthesizeSpeech(request);
         const os = require('os');
         const path = require('path');
         const outputPath = path.join(os.tmpdir(), 'output.mp3');
+        functions.logger.log(outputPath);
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(outputPath, response.audioContent);
+        functions.logger.log(outputPath);
 
         const storage = new Storage();
         const bucket = storage.bucket('echo-11de');
