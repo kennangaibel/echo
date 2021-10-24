@@ -79,16 +79,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
     };
 
     // Performs the text-to-speech request
-<<<<<<< HEAD
-    // async function parseAudio() {
-    //     const [response] = await client.synthesizeSpeech(request);
-    //     // Write the binary audio content to a local file
-    //     const writeFile = util.promisify(fs.writeFile);
-    //     await writeFile('output.mp3', response.audioContent, 'binary');
-    //     console.log('Audio content written to file: output.mp3');
-    // }
-    // await parseAudio();
-=======
+
     async function parseAudio() {
         const [response] = await client.synthesizeSpeech(request);
         // Write the binary audio content to a local file
@@ -96,17 +87,16 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
         //await writeFile('output.mp3', response.audioContent, 'binary');
 
         //Uploading mp3 to firebase storage
-        final StorageUploadTask uploadTask = storageRef.putFile(
+        let uploadTask = storageRef.putFile(
               File(filePath),
               StorageMetadata(
-                contentType: type + '/' + extension,
+                type + '/' + extension,
               ),
             );
         console.log('Audio content written to file: output.mp3');
     }
     //await parseAudio();
 
->>>>>>> 22934ae020fa1feb966991479e4a7666fa179e73
     // Need to get the mp3 file thats parsed into the firebase storage
     
     // let speaker = output.mp3;
