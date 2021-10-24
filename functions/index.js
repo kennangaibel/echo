@@ -101,7 +101,7 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
             destination: 'sound/output.mp3',
             metadata: metadata
         };
-        bucket.upload('', options).then(function(data) {
+        bucket.upload(outputPath, options).then(function(data) {
             const file = data[0];
         });
     }
