@@ -1,16 +1,16 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
 const functions = require('firebase-functions');
-const vision = require('@google-cloud/vision');
 // The Firebase Admin SDK to access Firestore.
 const admin = require('firebase-admin');
 admin.initializeApp();
 
 const fs = require('fs');
 const util = require('util');
+const vision = require('@google-cloud/vision');
 const textToSpeech = require('@google-cloud/text-to-speech');
 
 // any time storage is updated this function will run
-exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
+exports.visionAnalysis = functions.storage.object().onFinalize(async (object) => {
     const vision_client = new vision.ImageAnnotatorClient();
 // Taking the image and feed it into VISION API
 
@@ -34,7 +34,19 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     }
 
     try {
-        console.log(vision_client.annotateImage(JSON.parse(JSON.stringify(data))));
+        const request = {
+            image: {
+                source: { imageUri: `gs://${object.bucket}/${object.name}` },
+            },
+            features:[
+                {
+                    type: "LABEL_DETECTION",
+                    maxResults: 1
+                }
+            ]
+        };
+        const response = await vision_client.annotateImage(request);
+        functions.logger.log(response);
     } catch (e) {
         throw new functions.https.HttpsError("internal", e.message, e.details);
     }
@@ -52,9 +64,9 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
     let obj = JSON.parse(json);
     
     // Array where names of identified objects will be stored
-    var nameArray = [];
+    let nameArray = [];
     // Need to figure out name of jsonArray and how to number through the different objects
-    for (var i = 0; i < jsonArray.length; i++) {
+    for (let i = 0; i < jsonArray.length; i++) {
         // unsure if it should be obj.labelAnnotations.description
         nameArray.push(obj[i].description);
     }
@@ -86,7 +98,7 @@ exports.analyzeImage = functions.storage.object().onFinalize(async (object) => {
         await writeFile('output.mp3', response.audioContent, 'binary');
         console.log('Audio content written to file: output.mp3');
     }
-    parseAudio();
+    await parseAudio();
     // Need to get the mp3 file thats parsed into the firebase storage
 
 

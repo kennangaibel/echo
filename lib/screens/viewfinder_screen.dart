@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import '../main.dart';
 
@@ -18,6 +19,7 @@ class ViewfinderScreen extends StatefulWidget {
 class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBindingObserver {
   CameraController? controller;
   bool _isCameraInitialized = false;
+  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
 
   @override
   void initState() {
@@ -25,6 +27,10 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
 
     onNewCameraSelected(cameras[0]);
     super.initState();
+  }
+
+  play() async {
+    int result = await audioPlayer.play('assets/shutter.wav', isLocal: true);
   }
 
   @override
@@ -89,6 +95,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
   void dispose() {
     controller?.dispose();
     super.dispose();
+    audioPlayer.release();
   }
 
   Widget cameraShutter() {
@@ -146,6 +153,7 @@ class _ViewfinderScreenState extends State<ViewfinderScreen> with WidgetsBinding
     }).onError((error, stackTrace) => {
       print("Upload file path error ${error.toString()} ")
     });
+    play();
   }
 
   Widget wholeScreenButton(BuildContext context) {
