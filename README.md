@@ -1,5 +1,7 @@
 # Echo
 
+![Alt text]("Frame 2 (1).png"?raw=true "Title")
+
 Echo is an iOS application that takes an image of your surroundings and echoes back (audibly reads out) the objects that are included in the image. It aids visually impaired individuals by informing them of their surroundings. The UI of the application is a camera with shutter audio when the user captures images.
 
 ## What inspired us?
