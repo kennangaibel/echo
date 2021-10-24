@@ -94,8 +94,12 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 
         const storage = new Storage();
         const bucket = storage.bucket('echo-11de8.appspot.com');
+        const metadata = {
+            contentType: 'audio/mpeg'
+        }
         const options = {
-            destination: 'sound/'
+            destination: 'sound/',
+            metadata: metadata
         };
         bucket.upload(outputPath, options).then(function(data) {
             const file = data[0];
