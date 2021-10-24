@@ -83,16 +83,18 @@ exports.visionAnalysis = functions.storage.object().onFinalize(async (object) =>
 
     async function parseAudio() {
         const [response] = await client.synthesizeSpeech(request);
+        const os = require('os');
+        const path = require('path');
+        const outputPath = path.join(os.tmpdir(), 'output.mp3');
         // Write the binary audio content to a local file
         const writeFile = util.promisify(fs.writeFile);
-        //await writeFile('output.mp3', response.audioContent, 'binary');
-        const bucket = storage.bucket('echo-11de');
+        await writeFile(outputPath, response.audioContent);
 
+        const bucket = storage.bucket('echo-11de');
         const options = {
             destination: 'sound/'
         };
-
-        bucket.upload('output.mp3', options).then(function(data) {
+        bucket.upload(outputPath, options).then(function(data) {
             const file = data[0];
         });
     }
